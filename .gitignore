@@ -1,0 +1,22 @@
+# Standard MATLAB files to ignore
+*.asv
+*.m~
+*.mex*
+*.mltx
+slprj/
+sfprj/
+*.err
+
+# Ignore heavy metabolic model data (Crucial for this project)
+*.mat
+minReactModels/
+agora_2_models/
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
