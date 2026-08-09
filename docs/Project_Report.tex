@@ -1,0 +1,497 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- Core Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=0.8in, top=1.2in, bottom=1.2in}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{multirow}   % For closed-border tables
+
+% --- Typography Enhancements ---
+\usepackage{mathpazo} 
+\usepackage{microtype}
+
+% --- Colors & Graphics ---
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows}
+
+\definecolor{oxfordblue}{RGB}{0, 33, 71}
+\definecolor{linkblue}{RGB}{0, 80, 160}
+
+% --- Hyperlink Setup ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=oxfordblue,
+    filecolor=linkblue,      
+    urlcolor=linkblue,
+    citecolor=oxfordblue,
+    pdftitle={Final Research Report},
+}
+
+% --- Table of Contents Formatting ---
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\contentsname}{\vspace{-1.5cm}\Large \textcolor{oxfordblue}{\textbf{Index of Sections}}}
+
+% --- Section Formatting ---
+\titleformat{\section}
+  {\color{oxfordblue}\Large\bfseries\scshape}{\thesection.}{0.5em}{}[\vspace{-0.2cm}\color{oxfordblue}\titlerule\vspace{0.2cm}]
+\titleformat{\subsection}
+  {\color{oxfordblue}\large\bfseries}{\thesubsection}{0.5em}{}
+
+% --- Header & Footer Setup ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray} Project 2026/WSAI/018}
+\fancyhead[R]{\small\color{gray} Final Project Report}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{gray}\leaders\hrule height \headrulewidth\hfill}}
+
+\begin{document}
+\onehalfspacing
+
+% ---------------------------------------------------------
+% PAGE 1: TITLE PAGE
+% ---------------------------------------------------------
+\begin{titlepage}
+    \begin{center}
+        \vspace*{0.1cm}
+        \textsc{\small Wadhwani School of Data Science and AI (WSAI), IIT Madras}\\[0.4cm]
+        
+        \textbf{\Large Project 2026/WSAI/018: Final Project Report}\\[0.1cm]
+        \textbf{\large Discerning Ecological Behaviour and Interactions of Minimal\\ Reactomes of the Human Gut}\\[0.5cm]
+        
+        % WSAI Logo 
+        \includegraphics[height=2.0cm]{wsai logo.png}\\[0.5cm]
+        
+        \textbf{Avinash Chauhan}\\
+        \small BS-MS Third Year, IISER Thiruvananthapuram\\
+        Faculty In-Charge: Prof. Karthik Raman\\[0.5cm]
+        
+        % IISER Logo 
+        \includegraphics[height=1.8cm]{IISER TVM LOGO.jpg}\\[0.5cm]
+        
+        \textbf{Summer 2026}\\[0.4cm]
+        
+        \textbf{Abstract}
+    \end{center}
+    \vspace{-0.3cm}
+    \begin{quote}
+        \small \singlespacing
+        This document details the final project report for Project 2026/WSAI/018. The study outlines the algorithmic development and constraint-based mathematical modeling utilized to simulate 1,326 pairwise human gut microbial communities. The analysis evaluates metabolic redundancies, interaction transitions from wild-type (WT) to minimal reactomes, and the competitive exclusion principle across six dietary environments. The computational pipeline maps the trajectory of metabolic rewiring, indicating that metabolic reduction systematically drives cooperative microbial guilds into competitive ecological states, underscoring the role of metabolic redundancy in sustaining mutualism.
+    \end{quote}
+    
+    \vspace{0.2cm}
+    \begin{center}
+        \textbf{Acknowledgements}
+    \end{center}
+    \vspace{-0.3cm}
+    \begin{quote}
+        \small \singlespacing
+        I express my profound gratitude to my faculty in-charge, Prof. Karthik Raman, and my mentor, Sandhya Vasudevan, for their invaluable guidance and academic encouragement throughout this project. I thank the Wadhwani School of Data Science and AI (WSAI) at IIT Madras for providing the essential computational infrastructure. I also extend my sincere appreciation to my colleagues in the laboratory for fostering a collaborative and intellectually stimulating environment. Finally, I am deeply grateful to my home institution, IISER Thiruvananthapuram, for their foundational academic support.
+    \end{quote}
+    
+    \vfill
+    \noindent\rule{\textwidth}{0.8pt}
+\end{titlepage}
+
+% ---------------------------------------------------------
+% PAGE 2: INDEX OF SECTIONS
+% ---------------------------------------------------------
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+% ---------------------------------------------------------
+% SECTION 1: INTRODUCTION
+% ---------------------------------------------------------
+\section{Introduction}
+The enteric nervous system is frequently considered the body's second brain, and the gut microbiome plays a paramount role in its maintenance, directly impacting general host health \cite{2}. The ecosystem's composition and the complex metabolic interactions between gut organisms perform vital functional roles, including aiding digestion, protecting against pathogens, and regulating immune responses.
+
+Redundancy in metabolic networks is a fundamental requirement for evolutionary resilience. In the event of sudden nutritional perturbations, organisms with higher functional redundancies possess alternative metabolic pathways that permit survival on limited resources \cite{1}. However, defining the absolute essential pathways---the ``minimal reactome''---provides crucial insights into the core survival mechanisms of these species. The MinReact algorithm computationally isolates this minimal reactome by identifying the most essential reactions utilizing Mixed-Integer Linear Programming (MILP) and parsimonious Flux Balance Analysis (pFBA) \cite{1}. 
+
+This study systematically evaluates metabolic redundancy and ecosystem dynamics in 52 representative human gut bacterial species \cite{3}. By calculating inter-species similarities in minimal and wild-type (WT) reactomes, and computationally mapping 1,326 pairwise interactions across six distinct dietary conditions, this research addresses a fundamental ecological question: does the presence of redundant metabolic reactions facilitate mutualistic cooperation, and does the strict removal of this redundancy force organisms into competitive states within a shared ecological niche?
+
+% ---------------------------------------------------------
+% SECTION 2: METHODS & PIPELINE SETUP
+% ---------------------------------------------------------
+\section{Methods \& Pipeline Setup}
+
+\subsection{Finding Minimal Reactomes}
+Minimal metabolic networks were isolated for 52 human gut organisms using the MinReact computational framework \cite{1}. Minimal reactomes were computed by enforcing a strict growth rate cut-off, requiring models to retain a minimum of 5\% of their theoretical WT growth rate. 
+
+To maintain mathematical consistency and prevent solver infeasibility during restricted environmental simulations, an artificial ATP Maintenance (ATPM) scaling methodology was applied. The basal ATPM lower bound for each organism was scaled proportionally to match the target growth rate, preventing false model fatalities. Diet constraints were imposed by translating daily dietary limits into hourly uptake bounds. The models were evaluated across six distinct dietary profiles, summarized in Table \ref{tab:diets}.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Dietary Profile} & \textbf{Simulation Context} \\
+        \hline
+        No Diet & Unrestricted nutrient availability (Baseline) \\ \hline
+        High Fiber & Rich in complex carbohydrates \\ \hline
+        Mediterranean & Balanced, plant-rich, and healthy fats \\ \hline
+        Vegetarian & Strict plant-based nutrient bounds \\ \hline
+        Western & High fat and high sugar composition \\ \hline
+        Unhealthy & Highly processed, nutrient-poor bounds \\ \hline
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Summary of the six dietary environments simulated in the study.}
+    \label{tab:diets}
+\end{table}
+
+\subsection{Computing Jaccard Distance \& Interaction Scores}
+Metabolic overlap between any two species was quantified using the Jaccard similarity index. Constraint-based reconstruction and analysis (COBRA) was utilized to construct and simulate the 1,326 pairwise communities \cite{3}. The relative growth change ($\alpha$) for each organism $i$ within a community was calculated against its monoculture baseline:
+
+\begin{equation}
+\alpha_i = \frac{X_{i(\text{community})} - X_{i(\text{monoculture})}}{X_{i(\text{monoculture})}}
+\end{equation}
+
+Applying a tolerance band of $\pm0.1$ to define a metabolically ``unaffected'' state, the $\alpha$ values mapped each pair into one of six distinct ecological interaction types. Table \ref{tab:interaction_classification} outlines the categorical conditions (Note: Exploitation is functionally equivalent to Parasitism in this context).
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.3} 
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Condition on $\alpha_1$} & \textbf{Condition on $\alpha_2$} & \textbf{Interaction Type} \\
+        \hline
+        $-0.1 \le \alpha_1 \le 0.1$ & $\alpha_2 \le -0.1$ & \multirow{2}{*}{Amensalism} \\ \cline{1-2}
+        $\alpha_1 \le -0.1$ & $-0.1 \le \alpha_2 \le 0.1$ & \\
+        \hline
+        $-0.1 \le \alpha_1 \le 0.1$ & $\alpha_2 \ge 0.1$ & \multirow{2}{*}{Commensalism} \\ \cline{1-2}
+        $\alpha_1 \ge 0.1$ & $-0.1 \le \alpha_2 \le 0.1$ & \\
+        \hline
+        $\alpha_1 \le -0.1$ & $\alpha_2 \ge 0.1$ & \multirow{2}{*}{Exploitation} \\ \cline{1-2}
+        $\alpha_1 \ge 0.1$ & $\alpha_2 \le -0.1$ & \\
+        \hline
+        $\alpha_1 \le -0.1$ & $\alpha_2 \le -0.1$ & Competition \\
+        \hline
+        $\alpha_1 \ge 0.1$ & $\alpha_2 \ge 0.1$ & Mutualism \\
+        \hline
+        $-0.1 \le \alpha_1 \le 0.1$ & $-0.1 \le \alpha_2 \le 0.1$ & Neutralism \\
+        \hline
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Classification of pairwise interaction types based on computed $\alpha$ growth differentials.}
+    \label{tab:interaction_classification}
+\end{table}
+
+% ---------------------------------------------------------
+% SECTION 3: IMPLEMENTATION & ALGORITHMIC OPTIMIZATIONS
+% ---------------------------------------------------------
+\section{Algorithmic Implementation \& Optimizations}
+Executing high-throughput combinatorial simulations presented several computational challenges. The following optimizations were implemented to ensure pipeline stability:
+
+\begin{itemize}[itemsep=2pt, parsep=0pt]
+    \item \textbf{pFBALocal Stabilization:} 
+    \textit{Root Cause:} The legacy \texttt{fastFVA} plugin induced fatal solver crashes due to strict enforcement of exact FBA lower bounds, resulting in mathematically ``Infeasible'' matrices from floating-point rounding errors. 
+    \textit{Optimization:} The script was migrated to MATLAB's native \texttt{fluxVariability} tool. A $10^{-6}$ margin was subtracted from absolute bounds to provide the mathematical solver with tolerance limits, successfully mitigating matrix infeasibility.
+
+    \item \textbf{fluxVariability Correction:} 
+    \textit{Root Cause:} The \texttt{addCOBRAConstraints} command permanently altered the base model matrix, causing diet limits to sequentially compound across different combinatorial iterations. 
+    \textit{Optimization:} Permanent modifications were eliminated; growth bounds were strictly applied to temporary matrix instances within the loop execution.
+
+    \item \textbf{Memory Management:} 
+    \textit{Root Cause:} Initializing the toolbox inside a parallel loop resulted in severe RAM memory leaks, leading to CPLEX solver crashes. 
+    \textit{Optimization:} The environment was migrated to the Gurobi solver, and algorithmic conditionals (\texttt{isempty}) were integrated to safely bypass non-viable models without terminating the parallel pool.
+
+    \item \textbf{Minimal Reactome Energy Scaling:} 
+    \textit{Root Cause:} Models exhibited computational fatality during minimization as they were restricted to a 5\% growth rate while maintaining 100\% basal ATP requirements. 
+    \textit{Optimization:} An iterative scaling loop was introduced to proportionally lower non-negotiable ATPM costs alongside the target growth rate.
+\end{itemize}
+
+Table \ref{tab:parameters} summarizes the exact configuration constraints utilized to standardize the solver environment.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Parameter} & \textbf{Configured Value} \\
+        \hline
+        Mathematical Solver & Gurobi Optimizer \\ \hline
+        Minimal Reactome Growth Cut-off & 5\% of Baseline Wild-Type \\ \hline
+        Feasibility Tolerance Margin & $10^{-6}$ \\ \hline
+        ATPM Energy Scaling & Linear (Matched to target growth rate) \\ \hline
+        Interaction Threshold ($\alpha$) & $\pm 0.1$ \\ \hline
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Key algorithmic constraints and simulation solver parameters.}
+    \label{tab:parameters}
+\end{table}
+
+% ---------------------------------------------------------
+% SECTION 4: PIPELINE ARCHITECTURE & WORKFLOW
+% ---------------------------------------------------------
+\section{Computational Pipeline Architecture}
+The computational framework operates as an end-to-end, biphasic simulation. It quantifies the metabolic capacities of individual organisms in monoculture isolation and directly compares these baselines against combinatorial community models within a shared microenvironment.
+
+\subsection{Pipeline Logic and Data Flow}
+The workflow is defined by the following sequential execution stages:
+\begin{enumerate}[itemsep=2pt, parsep=0pt, topsep=4pt]
+    \item \textbf{Data Ingestion \& Standardization:} 52 WT genome-scale metabolic models, retrieved from the AGORA2 database with strain-level taxonomy mapped from NCBI, are loaded alongside 6 dietary profiles. Bounds are pre-processed to convert daily nutritional capacities into solver-compatible hourly rates.
+    \item \textbf{Phase 1 (Monoculture Analysis):} The \texttt{Minimal\_Reactomes.m} script calculates the maximum WT growth rate. Utilizing artificial ATPM scaling bounds, the algorithm applies MILP to isolate the strictly essential Minimal Reactome for each organism \cite{1}.
+    \item \textbf{Phase 2 (Community Assembly):} The \texttt{Pairwise\_Community.m} script iterates through all possible combinatorial pairs (${}^{52}C_{2} = 1,326$). It merges the specific models into a single, shared extracellular environment dictating competitive nutrient uptake.
+    \item \textbf{Optimization \& Classification:} Dual-objective optimizations are executed via the Gurobi solver. Community growth vectors are compared against monoculture baselines to determine the $\alpha$ differential.
+    \item \textbf{Analysis \& Visualization:} Resulting matrices are categorized into discrete ecological meta-classes based on the $\alpha$ thresholds for macro-level analysis.
+\end{enumerate}
+
+% --- Unbreakable Minipage Block for Section Heading & Flowchart ---
+\begin{minipage}{\textwidth}
+\subsection{Pipeline Flowchart}
+
+\begin{center}
+    \vspace{0.2cm}
+    \tikzstyle{block} = [rectangle, draw=oxfordblue, fill=blue!5, text width=6.5cm, text centered, rounded corners, minimum height=1.2cm, thick]
+    \tikzstyle{line} = [draw, -stealth, thick, oxfordblue]
+    \tikzstyle{cloud} = [ellipse, draw=green!50!black, fill=green!5, text width=5.5cm, text centered, minimum height=1.2cm, thick]
+    
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance = 1.0cm and 1.5cm, auto]
+        \node [cloud] (init) {52 AGORA2 Models (NCBI Strains) \&\\ 6 Diet Profiles};
+        \node [block, right=of init] (phase1) {\textbf{Phase 1: Monoculture}\\ Apply MinReact Algorithm \& ATPM Scaling};
+        
+        \node [block, below=of phase1] (extract) {\textbf{Model Generation}\\ Extract Minimal Reactomes \& WT Baselines};
+        \node [block, left=of extract] (phase2) {\textbf{Phase 2: Community Setup}\\ Assemble 1,326 Pairs in Shared Environment};
+        
+        \node [block, below=of phase2] (cobra) {\textbf{Optimization}\\ COBRA FBA \& Dual-Objective Maximization};
+        \node [block, right=of cobra] (classify) {\textbf{Classification}\\ Compute $\alpha$ Vectors \& Categorize Interactions};
+        
+        \path (cobra) -- (classify) coordinate[midway] (mid);
+        \node [cloud, below=0.8cm of mid] (output) {Final Datasets \&\\ Ecological Visualizations};
+        
+        \path [line] (init) -- (phase1);
+        \path [line] (phase1) -- (extract);
+        \path [line] (extract) -- (phase2);
+        \path [line] (phase2) -- (cobra);
+        \path [line] (cobra) -- (classify);
+        \path [line] (classify.south) |- (output.east);
+    \end{tikzpicture}%
+    }
+    \vspace{0.2cm}
+    \captionof{figure}{Process flow diagram outlining the biphasic data ingestion, optimization, and classification workflow.}
+\end{center}
+\end{minipage}
+\vspace{0.5cm}
+
+% ---------------------------------------------------------
+% SECTION 5: EMPIRICAL RESULTS & VISUALIZATIONS
+% ---------------------------------------------------------
+\section{Empirical Results \& Visualizations}
+
+\subsection{Interaction Composition Across Diets}
+Under WT conditions, microbial communities exhibited a high prevalence of synergistic interactions (Mutualism and Commensalism). However, upon algorithmic reduction to their minimal reactomes, this cooperative behavior was systematically replaced by antagonistic interactions, predominantly Amensalism and Exploitation. This shift suggests that non-essential, redundant metabolic pathways provide the biochemical flexibility required to sustain cross-feeding and mutualistic dependencies.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_HF.png} \caption{High Fiber} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_MED.png} \caption{Mediterranean} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_UNH.png} \caption{Unhealthy} \end{subfigure} \\[1ex]
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_VEG.png} \caption{Vegetarian} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_WES.png} \caption{Western} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot1_NOD.png} \caption{No Diet} \end{subfigure}
+    \caption{Distribution of ecological interaction types across six simulated dietary conditions. The transition from Wild-Type (WT) to Minimal Reactome (Reduced) models demonstrates a systemic shift from synergistic to antagonistic interactions.}
+\end{figure}
+
+\subsection{Monoculture vs. Pair Growth Dynamics}
+In the WT configuration, numerous organisms plotted above the diagonal, indicating accelerated growth rates resulting from the presence of a co-colonizing species. Conversely, minimal reactome models densely grouped below the diagonal. The absence of accessory metabolic networks severely restricted the organisms' capacity to exchange secondary metabolites, nullifying community-derived growth advantages.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Plot2_Consolidated.png}
+    \caption{Monoculture versus paired community growth rates. Data points above the diagonal indicate a quantifiable growth advantage in the community setting.}
+\end{figure}
+
+\newpage
+\subsection{Macro-Level Interaction Composition}
+Consolidating the data across all six diets illustrates a uniform macro-level trend. The substantive presence of Commensalism and Mutualism under natural WT bounds directly collapses into competitive exclusion models when forced into restricted reactome states, regardless of the macronutrient profile supplied by the diet.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Plot3_Consolidated.png}
+    \caption{Macro-level comparison of interaction compositions across all diets, highlighting the universal collapse of mutualism in reduced models.}
+\end{figure}
+
+\subsection{Community-wise Interaction Networks (52x52 Heatmap)}
+The computational scaling methodology enabled the successful evaluation of the entire $52\times52$ theoretical interaction grid without solver failures. The WT network (upper triangle) displays dense synergistic clustering, whereas the reduced network (lower triangle) highlights the dissolution of these collaborative guilds into highly competitive micro-factions.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_HF.png} \caption{High Fiber} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_MED.png} \caption{Mediterranean} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_UNH.png} \caption{Unhealthy} \end{subfigure} \\[1ex]
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_VEG.png} \caption{Vegetarian} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_WES.png} \caption{Western} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot4_NOD.png} \caption{No Diet} \end{subfigure}
+    \caption{$52\times52$ Community-wise interaction heatmaps mapping WT interactions (upper triangle) and Reduced interactions (lower triangle).}
+\end{figure}
+
+\newpage
+\subsection{WT to Minimal Reactome Interaction Transitions (Sankey)}
+Sankey diagrams track the state transitions of individual pairwise relationships. The visualization confirms that while some baseline Neutralism is preserved, the majority of communities initially exhibiting Mutualism or Commensalism under WT conditions transition strictly into Amensalism, Exploitation, or Competition upon metabolic minimization.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_HF.png} \caption{High Fiber} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_MED.png} \caption{Mediterranean} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_UNH.png} \caption{Unhealthy} \end{subfigure} \\[1ex]
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_VEG.png} \caption{Vegetarian} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_WES.png} \caption{Western} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot5_NOD.png} \caption{No Diet} \end{subfigure}
+    \caption{Sankey diagrams depicting the transition pathways of ecological interactions from WT to Minimal Reactome states.}
+\end{figure}
+
+\subsection{Phylum-pair Interaction Composition}
+Grouping the organisms by taxonomic phyla reveals clade-specific sensitivities. Firmicutes exhibited the most dramatic shifts in their interaction profiles upon minimization, indicating a heavy structural reliance on redundant pathways for community synergy. Conversely, Bacteroidetes maintained greater stability, reflecting a more inherently robust or self-contained metabolic architecture.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_HF.png} \caption{High Fiber} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_MED.png} \caption{Mediterranean} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_UNH.png} \caption{Unhealthy} \end{subfigure} \\[1ex]
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_VEG.png} \caption{Vegetarian} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_WES.png} \caption{Western} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot6_NOD.png} \caption{No Diet} \end{subfigure}
+    \caption{Phylum-level interaction composition grids demonstrating clade-specific sensitivities to metabolic reduction.}
+\end{figure}
+
+\newpage
+\subsection{Metabolic Overlap (Jaccard) vs Interaction Type}
+Organisms exhibiting high metabolic overlap overwhelmingly engaged in competitive interactions, primarily due to strict competition for identical nutritional niches. Conversely, synergistic interactions were exclusively localized within the low-overlap cohort, quantitatively supporting the hypothesis that metabolic divergence and distinct resource utilization drive collaborative cross-feeding \cite{3}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_HF.png} \caption{High Fiber} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_MED.png} \caption{Mediterranean} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_UNH.png} \caption{Unhealthy} \end{subfigure} \\[1ex]
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_VEG.png} \caption{Vegetarian} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_WES.png} \caption{Western} \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth} \includegraphics[width=\linewidth]{Plot7_NOD.png} \caption{No Diet} \end{subfigure}
+    \caption{Interaction composition mapped against metabolic overlap (Jaccard similarity) bins, illustrating the Competitive Exclusion Principle.}
+\end{figure}
+
+% ---------------------------------------------------------
+% SECTION 6: LIMITATIONS & FUTURE DIRECTIONS
+% ---------------------------------------------------------
+\section{Limitations \& Future Directions}
+While this constraint-based modeling approach provides valuable ecological insights, the study is fundamentally limited by its \textit{in silico} nature. The reliance on parsimonious Flux Balance Analysis assumes optimal metabolic steady states, which may not fully capture the dynamic, non-equilibrium conditions of \textit{in vivo} human gut environments. Furthermore, ecological mapping was derived strictly from stoichiometric metabolic fluxes, omitting spatial, regulatory, and temporal factors. Future work should focus on validating these computational predictions through \textit{in vitro} co-culture empirical testing and integrating transcriptomic data to refine the constraint boundaries, ultimately scaling the pipeline to encompass a broader phylogenetic diversity of the microbiome.
+
+% ---------------------------------------------------------
+% SECTION 7: CONCLUSIONS
+% ---------------------------------------------------------
+\section{Conclusion}
+This study strongly suggests that extensive metabolic redundancy is a fundamental prerequisite for cooperative ecology within the human gut microbiome. By systematically reducing 52 organisms to their core minimal reactomes utilizing an artificial ATPM scaling methodology, the analysis of 1,326 pairwise interactions demonstrated a systemic shift toward antagonistic behaviors when metabolic capacity is strictly constrained. Furthermore, the Jaccard similarity analysis provides computational support for the Competitive Exclusion Principle: high metabolic resource overlap strongly correlates with competition and exploitation, whereas evolutionary metabolic divergence facilitates mutualism and cross-feeding. Ultimately, metabolic redundancy serves not merely as a biological safeguard for individual organisms, but as a critical driver of stability and metabolic harmony within complex microbial ecosystems.
+
+\newpage
+% ---------------------------------------------------------
+% APPENDIX A: CSV DATASETS
+% ---------------------------------------------------------
+\section{Appendix A: Generated Datasets (CSV Exports)}
+The full datasets generated by the computational pipeline are attached to this report submission electronically as \texttt{.csv} files. The raw data matrices can be accessed and evaluated via the provided repositories below.
+
+\subsection{A.1 Monoculture Baselines}
+This dataset logs the monoculture baseline growth rates and the active reaction counts for all 52 models under WT and Minimal Reactome conditions across all 6 dietary constraints.\\[1ex]
+\textbf{Dataset Link:} \href{https://drive.google.com/file/d/16tFM3sCMiCcrVEg96z8FPKhaQhuYGHja/view?usp=sharing}{\texttt{minReactModels\_WideSummary.csv}}
+
+\subsection{A.2 Pairwise Community Growth Results}
+This primary dataset contains the combined, dual-objective growth rates and resultant classifications for every pairwise community interaction simulation.\\[1ex]
+\textbf{Dataset Link:} \href{https://drive.google.com/file/d/1j2NNFteoVdkNZv8fuKT-bwdMF6rWRPhN/view?usp=sharing}{\texttt{Community\_Results\_Wide\_52Models.csv}}
+
+% ---------------------------------------------------------
+% APPENDIX B: SCRIPT PIPELINE & REPRODUCIBILITY
+% ---------------------------------------------------------
+\section{Appendix B: Algorithmic Workflow \& Reproducibility}
+To ensure computational reproducibility, all simulations were executed within MATLAB utilizing the Gurobi Optimizer. Deterministic bounds and parameters (as detailed in Section 3) were strictly enforced across all parallel computational threads. The codebase has been modularized into distinct algorithmic engines and visualization scripts.
+
+\subsection{B.1 Primary Algorithmic Engines}
+\begin{itemize}[itemsep=4pt, parsep=0pt]
+    \item \textbf{\texttt{Minimal\_Reactomes.m}:} The core optimization engine. It initializes a parallel pool (\texttt{parpool}) to evaluate all 52 AGORA2 models across the 6 dietary profiles. It dynamically scales ATP maintenance bounds and computes the minimal reactome matrices via Mixed-Integer Linear Programming (MILP).
+    \item \textbf{\texttt{Monoculture52.m}:} The baseline generation script. It applies hourly dietary uptake constraints to both WT and the generated minimal models, computing theoretical monoculture growth rates via Flux Balance Analysis (FBA).
+    \item \textbf{\texttt{Pairwise\_Community.m}:} The ecosystem simulator. It constructs the 1,326 combinatorial pairs within a shared extracellular environment, executing dual-objective maximization to resolve competitive nutrient uptake.
+\end{itemize}
+
+\subsection{B.2 Data Visualization Suite}
+\begin{itemize}[itemsep=4pt, parsep=0pt]
+    \item \textbf{\texttt{Plot1\_InteractionCounts.m}:} Computes relative growth changes ($\alpha$) and renders stacked bar charts comparing ecological interaction compositions.
+    \item \textbf{\texttt{Plot2\_GrowthDynamics.m}:} Generates scatter plots comparing monoculture baseline growth against paired community growth to map cross-feeding advantages.
+    \item \textbf{\texttt{Plot3\_MacroComposition.m}:} Aggregates interaction types across all six diets into a macroscopic comparison matrix.
+    \item \textbf{\texttt{Plot4\_Heatmaps.m}:} Renders 52x52 community-wise interaction matrices (WT interactions mapped to the upper triangle, Reduced to the lower triangle).
+    \item \textbf{\texttt{Plot5\_SankeyTransitions.m}:} Employs a custom patch-based algorithmic renderer to draw Sankey ribbons, mapping exact community interaction state shifts.
+    \item \textbf{\texttt{Plot6\_PhylumGrids.m}:} Maps species to NCBI taxonomic phyla and generates scaled pie-chart matrices to evaluate phylogenetic interaction shifts.
+    \item \textbf{\texttt{Plot7\_JaccardOverlap.m}:} Computes exact reaction intersection-over-union (Jaccard similarity) and bins pairs by metabolic overlap to evaluate the competitive exclusion principle.
+\end{itemize}
+
+\newpage
+% ---------------------------------------------------------
+% APPENDIX C: MICROBIAL SPECIES ROSTER
+% ---------------------------------------------------------
+\section{Appendix C: Microbial Species Roster}
+Table \ref{tab:roster} details the 52 specific human gut bacterial models retrieved from the AGORA2 database, matched to their NCBI taxonomy and phylum classifications.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \textbf{Microbial Species (NCBI Strain)} & \textbf{Phylum} & \textbf{Microbial Species (NCBI Strain)} & \textbf{Phylum} \\
+        \hline
+        Acidaminococcus fermentans DSM 20731 & Firmicutes & Enterobacter cloacae EcWSU1 & Proteobacteria \\ \hline
+        Akkermansia muciniphila ATCC BAA 835 & Verrucomicrobia & Enterococcus faecium TX1330 & Firmicutes \\ \hline
+        Alistipes finegoldii DSM 17242 & Bacteroidetes & Escherichia coli str K 12 substr MG1655 & Proteobacteria \\ \hline
+        Alistipes putredinis DSM 17216 & Bacteroidetes & Eubacterium rectale M104 1 & Firmicutes \\ \hline
+        Alistipes shahii WAL 8301 & Bacteroidetes & Faecalibacterium prausnitzii L2 6 & Firmicutes \\ \hline
+        Bacteroides caccae ATCC 43185 & Bacteroidetes & Fusobacterium varium ATCC 27725 & Fusobacteria \\ \hline
+        Bacteroides coprocola M16 DSM 17136 & Bacteroidetes & Haemophilus parainfluenzae T3T1 & Proteobacteria \\ \hline
+        Bacteroides eggerthii DSM 20697 & Bacteroidetes & Helicobacter pylori 26695 & Proteobacteria \\ \hline
+        Bacteroides fragilis NCTC 9343 & Bacteroidetes & Klebsiella pneumoniae pneumoniae MGH78578 & Proteobacteria \\ \hline
+        Bacteroides intestinalis 341 DSM 17393 & Bacteroidetes & Lactobacillus mucosae LM1 & Firmicutes \\ \hline
+        Bacteroides stercoris ATCC 43183 & Bacteroidetes & Lactobacillus reuteri SD2112 ATCC 55730 & Firmicutes \\ \hline
+        Bacteroides thetaiotaomicron VPI 5482 & Bacteroidetes & Megasphaera elsdenii DSM 20460 & Firmicutes \\ \hline
+        Bacteroides uniformis ATCC 8492 & Bacteroidetes & Parabacteroides distasonis ATCC 8503 & Bacteroidetes \\ \hline
+        Bifidobacterium adolescentis ATCC 15703 & Actinobacteria & Parabacteroides johnsonii DSM 18315 & Bacteroidetes \\ \hline
+        Bifidobacterium bifidum PRL2010 & Actinobacteria & Phascolarctobacterium succinatutens YIT 12067 & Firmicutes \\ \hline
+        Bifidobacterium longum NCC2705 & Actinobacteria & Prevotella ruminicola 23 & Bacteroidetes \\ \hline
+        Bilophila wadsworthia 3 1 6 & Proteobacteria & Pseudoflavonifractor capillosus ATCC 29799 & Firmicutes \\ \hline
+        Blautia wexlerae DSM 19850 & Firmicutes & Roseburia intestinalis L1 82 & Firmicutes \\ \hline
+        Citrobacter amalonaticus Y19 & Proteobacteria & Roseburia inulinivorans DSM 16841 & Firmicutes \\ \hline
+        Clostridium clostridioforme CM201 & Firmicutes & Ruminococcus bromii L2 63 & Firmicutes \\ \hline
+        Collinsella tanakaei YIT 12063 & Actinobacteria & Ruminococcus callidus ATCC 2776001 & Firmicutes \\ \hline
+        Coprococcus catus GD 7 & Firmicutes & Ruminococcus torques ATCC 27756 & Firmicutes \\ \hline
+        Desulfovibrio desulfuricans DSM 642 & Proteobacteria & Shigella flexneri 2002017 & Proteobacteria \\ \hline
+        Desulfovibrio piger ATCC 29098 & Proteobacteria & Streptococcus salivarius JIM8777 & Firmicutes \\ \hline
+        Dialister invisus DSM 15470 & Firmicutes & Subdoligranulum variabile DSM 15176 & Firmicutes \\ \hline
+        Dorea longicatena DSM 13814 & Firmicutes & Veillonella atypica ACS 049 V Sch6 & Firmicutes \\ \hline
+    \end{tabular}%
+    }
+    \vspace{0.2cm}
+    \caption{Complete roster of 52 AGORA2 microbial species and their respective phyla.}
+    \label{tab:roster}
+\end{table}
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{9}
+    \bibitem{1} Sambamoorthy, G. \& Raman, K. MINREACT: a systematic approach for identifying minimal metabolic networks. \textit{Bioinformatics} \textbf{36}(15), 4309--4315 (2020).
+    \bibitem{2} Chng, K. R., Ghosh, T. S., Tan, Y. H., Nandi, T., Lee, I. R., Ng, A. H. Q., Li, C., Ravikrishnan, A., Lim, K. M., Lye, D., Barkham, T., Raman, K., Chen, S. L., Chai, L., Young, B., Gan, Y. H. \& Nagarajan, N. Metagenome-wide association analysis identifies microbial determinants of post-antibiotic ecological recovery in the gut. \textit{Nature Ecology \& Evolution} \textbf{4}, 1256--1267 (2020).
+    \bibitem{3} Ravikrishnan, A. \& Raman, K. Unraveling microbial interactions in the gut microbiome. \textit{bioRxiv} preprint, doi:10.1101/2021.05.17.444446 (2021).
+\end{thebibliography}
+
+\end{document}
